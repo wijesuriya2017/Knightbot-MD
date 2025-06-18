@@ -246,8 +246,7 @@ async function startXeonBotInc() {
             
             const botNumber = XeonBotInc.user.id.split(':')[0] + '@s.whatsapp.net';
             await XeonBotInc.sendMessage(botNumber, { 
-                text: `🤖 Bot Connected Successfully!\n\n⏰ Time: ${new Date().toLocaleString()}\n✅ Status: Online and Ready!
-                \n✅Make sure to join below channel`,
+                text: `🤖 Bot Connected Successfully!\n\n⏰ Time: ${new Date().toLocaleString()}\n✅ Status: Online and Ready!`,
                 contextInfo: {
                     forwardingScore: 1,
                     isForwarded: true,
@@ -265,7 +264,7 @@ async function startXeonBotInc() {
             console.log(chalk.magenta(`\n${global.themeemoji || '•'} YT CHANNEL: MR NAVI`))
             console.log(chalk.magenta(`${global.themeemoji || '•'} GITHUB: rcjestor`))
             console.log(chalk.magenta(`${global.themeemoji || '•'} WA NUMBER: ${owner}`))
-            console.log(chalk.magenta(`${global.themeemoji || '•'} CREDIT: MR UNIQUE HACKER`))
+            console.log(chalk.magenta(`${global.themeemoji || '•'} CREDIT: MR RC JESTOR`))
             console.log(chalk.green(`${global.themeemoji || '•'} 🤖 Bot Connected Successfully! ✅`))
         }
         if (
