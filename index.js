@@ -263,7 +263,7 @@ async function startXeonBotInc() {
             await delay(1999)
             console.log(chalk.yellow(`\n\n                  ${chalk.bold.blue(`[ ${global.botname || 'KNIGHT BOT'} ]`)}\n\n`))
             console.log(chalk.cyan(`< ================================================== >`))
-            console.log(chalk.magenta(`\n${global.themeemoji || '•'} YT CHANNEL: MR NAVI`))
+            console.log(chalk.magenta(`\n${global.themeemoji || '•'} YT CHANNEL: 𝐌𝐫 𝐑𝐂 𝐉𝐞𝐬𝐭𝐨𝐫`))
             console.log(chalk.magenta(`${global.themeemoji || '•'} GITHUB: rcjestor`))
             console.log(chalk.magenta(`${global.themeemoji || '•'} WA NUMBER: ${owner}`))
             console.log(chalk.magenta(`${global.themeemoji || '•'} CREDIT: MR RC JESTOR`))
