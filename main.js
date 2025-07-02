@@ -864,7 +864,7 @@ async function handleGroupParticipantUpdate(sock, update) {
                         isForwarded: true,
                         forwardedNewsletterMessageInfo: {
                             newsletterJid: channelId,
-                            newsletterName: 'KnightBot MD',
+                            newsletterName: '𝐌𝐫 𝐑𝐂 𝐉𝐞𝐬𝐭𝐨𝐫',
                             serverMessageId: -1
                         }
                     }
