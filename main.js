@@ -99,8 +99,8 @@ const videoCommand = require('./commands/video');
 // Global settings
 global.packname = settings.packname;
 global.author = settings.author;
-global.channelLink = "https://whatsapp.com/channel/0029Va90zAnIHphOuO8Msp3A";
-global.ytch = "Mr Unique Hacker";
+global.channelLink = "https://whatsapp.com/channel/0029Vb67r0SEquiMPLiAq51A";
+global.ytch = "𝐌𝐫 𝐑𝐂 𝐉𝐞𝐬𝐭𝐨𝐫";
 
 // Add this near the top of main.js with other global configurations
 const channelInfo = {
@@ -108,8 +108,8 @@ const channelInfo = {
         forwardingScore: 1,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363161513685998@newsletter',
-            newsletterName: 'KnightBot MD',
+            newsletterJid: '120363421047540687@newsletter',
+            newsletterName: '𝐌𝐫 𝐑𝐂 𝐉𝐞𝐬𝐭𝐨𝐫',
             serverMessageId: -1
         }
     }
@@ -145,6 +145,7 @@ async function handleMessages(sock, messageUpdate, printLog) {
             message.message?.videoMessage?.caption?.trim() ||
             ''
         ).toLowerCase().replace(/\.\s+/g, '.').trim();
+        
 
         // Preserve raw message for commands like .tag that need original casing
         const rawText = message.message?.conversation?.trim() ||
@@ -846,7 +847,7 @@ async function handleGroupParticipantUpdate(sock, update) {
             const data = JSON.parse(fs.readFileSync('./data/userGroupData.json'));
             const welcomeData = data.welcome[id];
             const welcomeMessage = welcomeData?.message || 'Welcome {user} to the group! 🎉';
-            const channelId = welcomeData?.channelId || '120363161513685998@newsletter';
+            const channelId = welcomeData?.channelId || '120363421047540687@newsletter';
 
             // Send welcome message for each new participant
             for (const participant of participants) {
@@ -864,7 +865,7 @@ async function handleGroupParticipantUpdate(sock, update) {
                         isForwarded: true,
                         forwardedNewsletterMessageInfo: {
                             newsletterJid: channelId,
-                            newsletterName: 'KnightBot MD',
+                            newsletterName: '𝐌𝐫 𝐑𝐂 𝐉𝐞𝐬𝐭𝐨𝐫',
                             serverMessageId: -1
                         }
                     }
@@ -886,7 +887,7 @@ async function handleGroupParticipantUpdate(sock, update) {
             const data = JSON.parse(fs.readFileSync('./data/userGroupData.json'));
             const goodbyeData = data.goodbye[id];
             const goodbyeMessage = goodbyeData?.message || 'Goodbye {user} 👋';
-            const channelId = goodbyeData?.channelId || '120363161513685998@newsletter';
+            const channelId = goodbyeData?.channelId || '120363421047540687@newsletter';
 
             // Send goodbye message for each leaving participant
             for (const participant of participants) {
@@ -903,7 +904,7 @@ async function handleGroupParticipantUpdate(sock, update) {
                         isForwarded: true,
                         forwardedNewsletterMessageInfo: {
                             newsletterJid: channelId,
-                            newsletterName: 'KnightBot MD',
+                            newsletterName: '𝐌𝐫 𝐑𝐂 𝐉𝐞𝐬𝐭𝐨𝐫',
                             serverMessageId: -1
                         }
                     }
