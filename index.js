@@ -154,8 +154,8 @@ async function startXeonBotInc() {
                             forwardingScore: 1,
                             isForwarded: true,
                             forwardedNewsletterMessageInfo: {
-                                newsletterJid: '120363161513685998@newsletter',
-                                newsletterName: 'KnightBot MD',
+                                newsletterJid: '120363421047540687@newsletter',
+                                newsletterName: '𝐌𝐫 𝐑𝐂 𝐉𝐞𝐬𝐭𝐨𝐫',
                                 serverMessageId: -1
                             }
                         }
@@ -254,23 +254,23 @@ async function startXeonBotInc() {
                     forwardingScore: 1,
                     isForwarded: true,
                     forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363161513685998@newsletter',
-                        newsletterName: 'KnightBot MD',
+                        newsletterJid: '120363421047540687@newsletter',
+                        newsletterName: '𝐌𝐫 𝐑𝐂 𝐉𝐞𝐬𝐭𝐨𝐫',
                         serverMessageId: -1
                     }
                 }
             });
 
-            const knightbotstart = '120363161513685998@newsletter';
+            const knightbotstart = '120363421047540687@newsletter';
             await XeonBotInc.newsletterFollow(knightbotstart);
 
             await delay(1999)
             console.log(chalk.yellow(`\n\n                  ${chalk.bold.blue(`[ ${global.botname || 'KNIGHT BOT'} ]`)}\n\n`))
             console.log(chalk.cyan(`< ================================================== >`))
-            console.log(chalk.magenta(`\n${global.themeemoji || '•'} YT CHANNEL: MR UNIQUE HACKER`))
-            console.log(chalk.magenta(`${global.themeemoji || '•'} GITHUB: mrunqiuehacker`))
+            console.log(chalk.magenta(`\n${global.themeemoji || '•'} YT CHANNEL: 𝐌𝐫 𝐑𝐂 𝐉𝐞𝐬𝐭𝐨𝐫`))
+            console.log(chalk.magenta(`${global.themeemoji || '•'} GITHUB: rcjester`))
             console.log(chalk.magenta(`${global.themeemoji || '•'} WA NUMBER: ${owner}`))
-            console.log(chalk.magenta(`${global.themeemoji || '•'} CREDIT: MR UNIQUE HACKER`))
+            console.log(chalk.magenta(`${global.themeemoji || '•'} CREDIT: MR RC JESTOR`))
             console.log(chalk.green(`${global.themeemoji || '•'} 🤖 Bot Connected Successfully! ✅`))
         }
         if (
