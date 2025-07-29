@@ -9,7 +9,7 @@ async function aliveCommand(sock, chatId, message) {
                        `• Group Management\n` +
                        `• Antilink Protection\n` +
                        `• Fun Commands\n` +
-                       `• And more!\n\n` +
+                       `• And many more!\n\n` +
                        `Type *.menu* for full command list`;
 
         await sock.sendMessage(chatId, {
