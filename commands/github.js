@@ -14,7 +14,7 @@ async function githubCommand(sock, chatId, message) {
     txt += `✩  *Size* : ${(json.size / 1024).toFixed(2)} MB\n`;
     txt += `✩  *Last Updated* : ${moment(json.updated_at).format('DD/MM/YY - HH:mm:ss')}\n`;
     txt += `✩  *URL* : ${json.html_url}\n`;
-    txt += `✩  *Developer* : ${json.owner.login}\n`;
+    txt += `✩  *Developer* : Navida Wijesuriya\n`;
     txt += `✩  *Features* : Auto-Reply, Group Tools, Fun Commands\n`;
     txt += `✩  *Status* : 🚀 Live and Improving\n\n`;
 
