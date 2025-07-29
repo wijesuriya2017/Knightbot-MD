@@ -17,7 +17,6 @@ async function githubCommand(sock, chatId, message) {
     txt += `✩  *Developer* : Navida Wijesuriya\n`;
     txt += `✩  *Features* : Auto-Reply, Group Tools, Fun Commands\n`;
     txt += `✩  *Status* : 🚀 Live and Improving\n\n`;
-
     txt += `💥 *KnightBot MD*`;
 
     // Use the local asset image
