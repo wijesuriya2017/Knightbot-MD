@@ -67,6 +67,8 @@ async function helpCommand(sock, chatId, message) {
 ║ ➤ .cleartmp
 ║ ➤ .setpp <reply to image>
 ║ ➤ .autoreact
+║ ➤ .autotyping <on/off>
+║ ➤ .autoread <on/off>
 ╚═══════════════════╝
 
 ╔═══════════════════╗

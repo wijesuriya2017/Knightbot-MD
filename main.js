@@ -9,7 +9,9 @@ const ytdl = require('ytdl-core');
 const path = require('path');
 const axios = require('axios');
 const ffmpeg = require('fluent-ffmpeg');
-const { addWelcome, delWelcome, isWelcomeOn, addGoodbye, delGoodBye, isGoodByeOn } = require('./lib/index');
+const { addWelcome, delWelcome, isWelcomeOn, addGoodbye, delGoodBye, isGoodByeOn, isSudo } = require('./lib/index');
+const { autotypingCommand, isAutotypingEnabled, handleAutotypingForMessage, handleAutotypingForCommand, showTypingAfterCommand } = require('./commands/autotyping');
+const { autoreadCommand, isAutoreadEnabled, handleAutoread } = require('./commands/autoread');
 
 // Command imports
 const tagAllCommand = require('./commands/tagall');
@@ -94,6 +96,7 @@ const { shayariCommand } = require('./commands/shayari');
 const { rosedayCommand } = require('./commands/roseday');
 const imagineCommand = require('./commands/imagine');
 const videoCommand = require('./commands/video');
+const sudoCommand = require('./commands/sudo');
 
 
 // Global settings
@@ -123,6 +126,9 @@ async function handleMessages(sock, messageUpdate, printLog) {
         const message = messages[0];
         if (!message?.message) return;
 
+        // Handle autoread functionality
+        await handleAutoread(sock, message);
+
         // Store message for antidelete feature
         if (message.message) {
             storeMessage(message);
@@ -137,6 +143,7 @@ async function handleMessages(sock, messageUpdate, printLog) {
         const chatId = message.key.remoteJid;
         const senderId = message.key.participant || message.key.remoteJid;
         const isGroup = chatId.endsWith('@g.us');
+        const senderIsSudo = await isSudo(senderId);
 
         const userMessage = (
             message.message?.conversation?.trim() ||
@@ -194,6 +201,9 @@ async function handleMessages(sock, messageUpdate, printLog) {
 
         // Then check for command prefix
         if (!userMessage.startsWith('.')) {
+            // Show typing indicator if autotyping is enabled
+            await handleAutotypingForMessage(sock, chatId, userMessage);
+
             if (isGroup) {
                 // Process non-command messages first
                 await handleChatbotResponse(sock, chatId, message, userMessage, senderId);
@@ -208,7 +218,7 @@ async function handleMessages(sock, messageUpdate, printLog) {
         const isAdminCommand = adminCommands.some(cmd => userMessage.startsWith(cmd));
 
         // List of owner commands
-        const ownerCommands = ['.mode', '.autostatus', '.antidelete', '.cleartmp', '.setpp', '.clearsession', '.areact', '.autoreact'];
+        const ownerCommands = ['.mode', '.autostatus', '.antidelete', '.cleartmp', '.setpp', '.clearsession', '.areact', '.autoreact', '.autotyping', '.autoread'];
         const isOwnerCommand = ownerCommands.some(cmd => userMessage.startsWith(cmd));
 
         let isSenderAdmin = false;
@@ -221,7 +231,7 @@ async function handleMessages(sock, messageUpdate, printLog) {
             isBotAdmin = adminStatus.isBotAdmin;
 
             if (!isBotAdmin) {
-                await sock.sendMessage(chatId, { text: 'Please make the bot an admin to use admin commands.', ...channelInfo }, {quoted: message});
+                await sock.sendMessage(chatId, { text: 'Please make the bot an admin to use admin commands.', ...channelInfo }, { quoted: message });
                 return;
             }
 
@@ -245,12 +255,8 @@ async function handleMessages(sock, messageUpdate, printLog) {
 
         // Check owner status for owner commands
         if (isOwnerCommand) {
-            // Check if message is from owner (fromMe) or bot itself
-            if (!message.key.fromMe) {
-                await sock.sendMessage(chatId, {
-                    text: '❌ This command is only available for the owner!',
-                    ...channelInfo
-                });
+            if (!message.key.fromMe && !senderIsSudo) {
+                await sock.sendMessage(chatId, { text: '❌ This command is only available for the owner or sudo!' });
                 return;
             }
         }
@@ -259,7 +265,7 @@ async function handleMessages(sock, messageUpdate, printLog) {
         try {
             const data = JSON.parse(fs.readFileSync('./data/messageCount.json'));
             // Allow owner to use bot even in private mode
-            if (!data.isPublic && !message.key.fromMe) {
+            if (!data.isPublic && !message.key.fromMe && !senderIsSudo) {
                 return; // Silently ignore messages from non-owners when in private mode
             }
         } catch (error) {
@@ -267,7 +273,10 @@ async function handleMessages(sock, messageUpdate, printLog) {
             // Default to public mode if there's an error reading the file
         }
 
-        // Command handlers
+        // Command handlers - Execute commands immediately without waiting for typing indicator
+        // We'll show typing indicator after command execution if needed
+        let commandExecuted = false;
+
         switch (true) {
             case userMessage === '.simage': {
                 const quotedMessage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
@@ -276,6 +285,7 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 } else {
                     await sock.sendMessage(chatId, { text: 'Please reply to a sticker with the .simage command to convert it.', ...channelInfo });
                 }
+                commandExecuted = true;
                 break;
             }
             case userMessage.startsWith('.kick'):
@@ -301,9 +311,11 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 break;
             case userMessage === '.help' || userMessage === '.menu' || userMessage === '.bot' || userMessage === '.list':
                 await helpCommand(sock, chatId, message, global.channelLink);
+                commandExecuted = true;
                 break;
             case userMessage === '.sticker' || userMessage === '.s':
                 await stickerCommand(sock, chatId, message);
+                commandExecuted = true;
                 break;
             case userMessage.startsWith('.warnings'):
                 const mentionedJidListWarnings = message.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
@@ -325,7 +337,7 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 break;
             case userMessage.startsWith('.mode'):
                 // Check if sender is the owner
-                if (!message.key.fromMe) {
+                if (!message.key.fromMe && !senderIsSudo) {
                     await sock.sendMessage(chatId, { text: 'Only bot owner can use this command!', ...channelInfo });
                     return;
                 }
@@ -378,7 +390,7 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 if (isSenderAdmin || message.key.fromMe) {
                     await tagAllCommand(sock, chatId, senderId, message);
                 } else {
-                    await sock.sendMessage(chatId, { text: 'Sorry, only group admins can use the .tagall command.', ...channelInfo }, {quoted: message});
+                    await sock.sendMessage(chatId, { text: 'Sorry, only group admins can use the .tagall command.', ...channelInfo }, { quoted: message });
                 }
                 break;
             case userMessage.startsWith('.tag'):
@@ -748,8 +760,11 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 await handleSsCommand(sock, chatId, message, userMessage.slice(ssCommandLength).trim());
                 break;
             case userMessage.startsWith('.areact') || userMessage.startsWith('.autoreact') || userMessage.startsWith('.autoreaction'):
-                const isOwner = message.key.fromMe;
-                await handleAreactCommand(sock, chatId, message, isOwner);
+                const isOwnerOrSudo = message.key.fromMe || senderIsSudo;
+                await handleAreactCommand(sock, chatId, message, isOwnerOrSudo);
+                break;
+            case userMessage.startsWith('.sudo'):
+                await sudoCommand(sock, chatId, message);
                 break;
             case userMessage === '.goodnight' || userMessage === '.lovenight' || userMessage === '.gn':
                 await goodnightCommand(sock, chatId, message);
@@ -760,29 +775,18 @@ async function handleMessages(sock, messageUpdate, printLog) {
             case userMessage === '.roseday':
                 await rosedayCommand(sock, chatId, message);
                 break;
-            case userMessage.startsWith('.imagine') || userMessage.startsWith('.flux') || userMessage.startsWith('.dalle'):
-                await imagineCommand(sock, chatId, message);
+            case userMessage.startsWith('.imagine') || userMessage.startsWith('.flux') || userMessage.startsWith('.dalle'): await imagineCommand(sock, chatId, message);
                 break;
-            case userMessage === '.jid':
-                await groupJidCommand(sock, chatId, message);
+            case userMessage === '.jid': await groupJidCommand(sock, chatId, message);
                 break;
-
-                // Function to handle .groupjid command
-                async function groupJidCommand(sock, chatId, message) {
-                    const groupJid = message.key.remoteJid;
-
-                    if (!groupJid.endsWith('@g.us')) {
-                        return await sock.sendMessage(chatId, {
-                            text: "❌ This command can only be used in a group."
-                        });
-                    }
-
-                    await sock.sendMessage(chatId, {
-                        text: `✅ Group JID: ${groupJid}`
-                    }, {
-                        quoted: message
-                    });
-                }
+            case userMessage.startsWith('.autotyping'):
+                await autotypingCommand(sock, chatId, message);
+                commandExecuted = true;
+                break;
+            case userMessage.startsWith('.autoread'):
+                await autoreadCommand(sock, chatId, message);
+                commandExecuted = true;
+                break;
 
             default:
                 if (isGroup) {
@@ -793,7 +797,31 @@ async function handleMessages(sock, messageUpdate, printLog) {
                     await Antilink(message, sock);
                     await handleBadwordDetection(sock, chatId, message, userMessage, senderId);
                 }
+                commandExecuted = false;
                 break;
+        }
+
+        // If a command was executed, show typing status after command execution
+        if (commandExecuted !== false) {
+            // Command was executed, now show typing status after command execution
+            await showTypingAfterCommand(sock, chatId);
+        }
+
+        // Function to handle .groupjid command
+        async function groupJidCommand(sock, chatId, message) {
+            const groupJid = message.key.remoteJid;
+
+            if (!groupJid.endsWith('@g.us')) {
+                return await sock.sendMessage(chatId, {
+                    text: "❌ This command can only be used in a group."
+                });
+            }
+
+            await sock.sendMessage(chatId, {
+                text: `✅ Group JID: ${groupJid}`
+            }, {
+                quoted: message
+            });
         }
 
         if (userMessage.startsWith('.')) {
