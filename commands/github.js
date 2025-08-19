@@ -19,9 +19,43 @@ async function githubCommand(sock, chatId, message) {
     txt += `✩  *Status* : 🚀 Live and Improving\n\n`;
     txt += `💥 *KnightBot MD*`;
 
-    // Use the local asset image
-    const imgPath = path.join(__dirname, '../assets/bot_image.jpg');
-    const imgBuffer = fs.readFileSync(imgPath);
+    // --- EXTRA ITEMS (new, without replacing old ones) ---
+    txt += `\n\n✨ *Extra Info* ✨\n`;
+    txt += `⭐ Stars: ${json.stargazers_count}\n`;
+    txt += `🍴 Forks: ${json.forks_count}\n`;
+    txt += `🐞 Issues: ${json.open_issues_count}\n`;
+
+    // Random extra status line
+    const statuses = ["⚡ Active & Growing", "🔥 Stable Release", "🌟 Community Driven"];
+    txt += `🎯 More Status: ${statuses[Math.floor(Math.random() * statuses.length)]}\n`;
+
+    // GitHub badges
+    txt += `\n🔗 *Badges*:\n`;
+    txt += `https://img.shields.io/github/stars/${json.full_name}?style=for-the-badge\n`;
+    txt += `https://img.shields.io/github/forks/${json.full_name}?style=for-the-badge\n`;
+    txt += `https://img.shields.io/github/issues/${json.full_name}?style=for-the-badge\n`;
+
+    // Try to fetch top contributors
+    try {
+      const contribRes = await fetch(`https://api.github.com/repos/${json.full_name}/contributors?per_page=3`);
+      const contributors = await contribRes.json();
+      if (Array.isArray(contributors) && contributors.length) {
+        txt += `\n👥 *Top Contributors*:\n`;
+        contributors.forEach((c, i) => {
+          txt += `${i + 1}. ${c.login}\n`;
+        });
+      }
+    } catch {}
+
+    // Use the local asset image (fallback to owner avatar if missing)
+    let imgBuffer;
+    try {
+      const imgPath = path.join(__dirname, '../assets/bot_image.jpg');
+      imgBuffer = fs.readFileSync(imgPath);
+    } catch {
+      const avatarRes = await fetch(json.owner.avatar_url);
+      imgBuffer = await avatarRes.buffer();
+    }
 
     await sock.sendMessage(chatId, { image: imgBuffer, caption: txt }, { quoted: message });
   } catch (error) {
