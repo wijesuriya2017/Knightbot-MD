@@ -197,7 +197,7 @@ async function handleMessages(sock, messageUpdate, printLog) {
 
             if (buttonId === 'channel') {
                 await sock.sendMessage(chatId, {
-                    text: '📢 *Join our Channel:*\nhttps://whatsapp.com/channel/0029Va90zAnIHphOuO8Msp3A'
+                    text: '📢 *Join our Channel:*\nhttps://www.whatsapp.com/channel/0029Vb67r0SEquiMPLiAq51A'
                 }, { quoted: message });
                 return;
             } else if (buttonId === 'owner') {
@@ -206,7 +206,7 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 return;
             } else if (buttonId === 'support') {
                 await sock.sendMessage(chatId, {
-                    text: `🔗 *Support*\n\nhttps://chat.whatsapp.com/GA4WrOFythU6g3BFVubYM7?mode=wwt`
+                    text: `🔗 *Support*\n\nhttps://chat.whatsapp.com/C4dUn8d2UeX799tsqCf1Rr`
                 }, { quoted: message });
                 return;
             }
